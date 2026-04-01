@@ -4,7 +4,6 @@ import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, existsSync } from 
 import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
-import { fileURLToPath } from 'node:url'
 
 const __dirname = new URL('.', import.meta.url).pathname
 const yashaPath = resolve(__dirname, '../bin/yasha.js')
