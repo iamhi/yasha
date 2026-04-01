@@ -1,0 +1,13 @@
+{
+  "name": "yasha",
+  "owner": {
+    "name": "iamhi"
+  },
+  "plugins": [
+    {
+      "name": "yasha",
+      "source": ".",
+      "description": "Upgrade every package.json dependency to the latest published version, wipe lockfile and node_modules, then reinstall clean."
+    }
+  ]
+}

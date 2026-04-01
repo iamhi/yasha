@@ -5,19 +5,32 @@ import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 
-const __dirname = new URL('.', import.meta.url).pathname
-const yashaPath = resolve(__dirname, '../bin/yasha.js')
-const mockNpmDir = __dirname
+const yashaPath = resolve(new URL('.', import.meta.url).pathname, '../bin/yasha.js')
 
-function runYasha(cwd) {
+const mockNpmScript = `#!/usr/bin/env bash
+if [[ "$1" == "view" ]]; then
+  echo "9.9.9"
+elif [[ "$1" == "install" ]]; then
+  echo "mock npm install"
+fi
+`
+
+function makeTempDir() {
+  const dir = mkdtempSync(join(tmpdir(), 'yasha-test-'))
+  writeFileSync(join(dir, 'npm'), mockNpmScript, { mode: 0o755 })
+  return dir
+}
+
+function runYasha(cwd, mockDir) {
   return execFileSync('node', [yashaPath], {
     cwd,
     encoding: 'utf8',
-    env: { ...process.env, PATH: `${mockNpmDir}:${process.env.PATH}` }
+    env: { ...process.env, PATH: `${mockDir}:${process.env.PATH}` }
   })
 }
 
 test('updates dependencies and devDependencies to latest', () => {
+  const mockDir = makeTempDir()
   const dir = mkdtempSync(join(tmpdir(), 'yasha-test-'))
   writeFileSync(join(dir, 'package.json'), JSON.stringify({
     name: 'test-pkg',
@@ -25,7 +38,7 @@ test('updates dependencies and devDependencies to latest', () => {
     devDependencies: { jest: '^27.0.0' }
   }, null, 2))
 
-  runYasha(dir)
+  runYasha(dir, mockDir)
 
   const result = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
   assert.equal(result.dependencies.express, '9.9.9')
@@ -33,6 +46,7 @@ test('updates dependencies and devDependencies to latest', () => {
 })
 
 test('removes node_modules and package-lock.json before installing', () => {
+  const mockDir = makeTempDir()
   const dir = mkdtempSync(join(tmpdir(), 'yasha-test-'))
   writeFileSync(join(dir, 'package.json'), JSON.stringify({
     name: 'test-pkg',
@@ -42,19 +56,20 @@ test('removes node_modules and package-lock.json before installing', () => {
   mkdirSync(join(dir, 'node_modules'))
   writeFileSync(join(dir, 'package-lock.json'), '{}')
 
-  runYasha(dir)
+  runYasha(dir, mockDir)
 
   assert.equal(existsSync(join(dir, 'package-lock.json')), false)
   assert.equal(existsSync(join(dir, 'node_modules')), false)
 })
 
 test('exits with error when no package.json found', () => {
+  const mockDir = makeTempDir()
   const dir = mkdtempSync(join(tmpdir(), 'yasha-test-'))
   assert.throws(
     () => execFileSync('node', [yashaPath], {
       cwd: dir,
       encoding: 'utf8',
-      env: { ...process.env, PATH: `${mockNpmDir}:${process.env.PATH}` }
+      env: { ...process.env, PATH: `${mockDir}:${process.env.PATH}` }
     }),
     (err) => {
       assert.match(err.stderr, /no package\.json found/)
@@ -64,6 +79,7 @@ test('exits with error when no package.json found', () => {
 })
 
 test('preserves other package.json fields', () => {
+  const mockDir = makeTempDir()
   const dir = mkdtempSync(join(tmpdir(), 'yasha-test-'))
   writeFileSync(join(dir, 'package.json'), JSON.stringify({
     name: 'my-app',
@@ -72,7 +88,7 @@ test('preserves other package.json fields', () => {
     dependencies: { lodash: '4.0.0' }
   }, null, 2))
 
-  runYasha(dir)
+  runYasha(dir, mockDir)
 
   const result = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
   assert.equal(result.name, 'my-app')

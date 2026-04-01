@@ -1,0 +1,12 @@
+{
+  "name": "yasha",
+  "version": "1.0.0",
+  "description": "Upgrade every package.json dependency to the latest published version, wipe lockfile and node_modules, then reinstall clean.",
+  "author": {
+    "name": "iamhi"
+  },
+  "homepage": "https://github.com/iamhi/yasha",
+  "repository": "https://github.com/iamhi/yasha",
+  "license": "MIT",
+  "keywords": ["npm", "dependencies", "upgrade", "package.json"]
+}

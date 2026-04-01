@@ -1,12 +1,36 @@
 {
   "name": "yasha",
   "version": "1.0.0",
-  "description": "CLI to update all package.json dependencies to latest versions",
+  "description": "CLI + Claude Code plugin that upgrades every package.json dependency to the latest published version, wipes node_modules and package-lock.json, then reinstalls clean.",
   "bin": {
     "yasha": "./bin/yasha.js"
   },
   "type": "module",
+  "files": [
+    "bin",
+    "skills",
+    "commands",
+    ".claude-plugin",
+    "readme.md"
+  ],
   "scripts": {
     "test": "node --test test/yasha.test.js"
+  },
+  "keywords": [
+    "npm",
+    "dependencies",
+    "upgrade",
+    "package.json",
+    "claude-code",
+    "claude-plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamhi/yasha.git"
+  },
+  "homepage": "https://github.com/iamhi/yasha",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
   }
 }
