@@ -1,0 +1,12 @@
+{
+  "name": "yasha",
+  "version": "1.0.0",
+  "description": "CLI to update all package.json dependencies to latest versions",
+  "bin": {
+    "yasha": "./bin/yasha.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/yasha.test.js"
+  }
+}
