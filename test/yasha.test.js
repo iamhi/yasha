@@ -4,9 +4,11 @@ import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, existsSync } from 
 import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
+import { fileURLToPath } from 'node:url'
 
-const yashaPath = resolve('bin/yasha.js')
-const mockNpmDir = resolve('test')
+const __dirname = new URL('.', import.meta.url).pathname
+const yashaPath = resolve(__dirname, '../bin/yasha.js')
+const mockNpmDir = __dirname
 
 function runYasha(cwd) {
   return execFileSync('node', [yashaPath], {
@@ -44,6 +46,7 @@ test('removes node_modules and package-lock.json before installing', () => {
   runYasha(dir)
 
   assert.equal(existsSync(join(dir, 'package-lock.json')), false)
+  assert.equal(existsSync(join(dir, 'node_modules')), false)
 })
 
 test('exits with error when no package.json found', () => {
