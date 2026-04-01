@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Fake npm: "npm view <pkg> version" always returns "9.9.9"
+# "npm install" is a no-op
+if [[ "$1" == "view" ]]; then
+  echo "9.9.9"
+elif [[ "$1" == "install" ]]; then
+  echo "mock npm install"
+fi
