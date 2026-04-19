@@ -1,6 +1,6 @@
 {
   "name": "yasha",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI + Claude Code plugin that upgrades every package.json dependency to the latest published version, wipes node_modules and package-lock.json, then reinstalls clean.",
   "bin": {
     "yasha": "./bin/yasha.js"
