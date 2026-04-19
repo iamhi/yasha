@@ -6,7 +6,10 @@
   "plugins": [
     {
       "name": "yasha",
-      "source": ".",
+      "source": {
+        "source": "github",
+        "repo": "iamhi/yasha"
+      },
       "description": "Upgrade every package.json dependency to the latest published version, wipe lockfile and node_modules, then reinstall clean."
     }
   ]
