@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 
 const cwd = process.cwd()
 const pkgPath = join(cwd, 'package.json')
-const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+const isWindows = process.platform === 'win32'
+const npmCmd = isWindows ? 'npm.cmd' : 'npm'
+const execOpts = { shell: isWindows }
 
 if (!existsSync(pkgPath)) {
   console.error('Error: no package.json found in current directory')
@@ -21,7 +23,7 @@ for (const group of depGroups) {
   if (!pkg[group]) continue
   for (const name of Object.keys(pkg[group])) {
     try {
-      const latest = execFileSync(npmCmd, ['view', name, 'version'], { encoding: 'utf8' }).trim()
+      const latest = execFileSync(npmCmd, ['view', name, 'version'], { encoding: 'utf8', ...execOpts }).trim()
       pkg[group][name] = latest
     } catch {
       console.warn(`Warning: could not resolve latest version for ${name}, skipping`)
@@ -41,4 +43,7 @@ if (existsSync(lockPath)) {
   rmSync(lockPath)
 }
 
-execFileSync(npmCmd, ['install'], { stdio: 'inherit', cwd })
+const installResult = spawnSync(npmCmd, ['install'], { stdio: 'inherit', cwd, shell: isWindows })
+if (installResult.status !== 0) {
+  process.exit(installResult.status ?? 1)
+}

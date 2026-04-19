@@ -39,20 +39,23 @@ Run from the project root:
 
 ```sh
 node -e "
-const fs=require('fs'),{execFileSync}=require('child_process');
-const npm=process.platform==='win32'?'npm.cmd':'npm';
+const fs=require('fs'),{execFileSync,spawnSync}=require('child_process');
+const win=process.platform==='win32';
+const npm=win?'npm.cmd':'npm';
+const opts={shell:win};
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 for(const g of ['dependencies','devDependencies']){
   if(!pkg[g])continue;
   for(const n of Object.keys(pkg[g])){
-    try{pkg[g][n]=execFileSync(npm,['view',n,'version'],{encoding:'utf8'}).trim()}
+    try{pkg[g][n]=execFileSync(npm,['view',n,'version'],{encoding:'utf8',...opts}).trim()}
     catch{console.warn('skip',n)}
   }
 }
 fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');
 fs.rmSync('node_modules',{recursive:true,force:true});
 fs.rmSync('package-lock.json',{force:true});
-execFileSync(npm,['install'],{stdio:'inherit'});
+const r=spawnSync(npm,['install'],{stdio:'inherit',shell:win});
+if(r.status!==0)process.exit(r.status??1);
 "
 ```
 
