@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 const cwd = process.cwd()
 const pkgPath = join(cwd, 'package.json')
+const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 
 if (!existsSync(pkgPath)) {
   console.error('Error: no package.json found in current directory')
@@ -20,7 +21,7 @@ for (const group of depGroups) {
   if (!pkg[group]) continue
   for (const name of Object.keys(pkg[group])) {
     try {
-      const latest = execFileSync('npm', ['view', name, 'version'], { encoding: 'utf8' }).trim()
+      const latest = execFileSync(npmCmd, ['view', name, 'version'], { encoding: 'utf8' }).trim()
       pkg[group][name] = latest
     } catch {
       console.warn(`Warning: could not resolve latest version for ${name}, skipping`)
@@ -40,4 +41,4 @@ if (existsSync(lockPath)) {
   rmSync(lockPath)
 }
 
-execFileSync('npm', ['install'], { stdio: 'inherit', cwd })
+execFileSync(npmCmd, ['install'], { stdio: 'inherit', cwd })
