@@ -1,6 +1,6 @@
 {
   "name": "yasha",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Upgrade every package.json dependency to the latest published version, wipe lockfile and node_modules, then reinstall clean.",
   "author": {
     "name": "iamhi"
