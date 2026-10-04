@@ -1,6 +1,6 @@
 # Yasha
 
-Upgrades every `dependencies` and `devDependencies` entry in `package.json` to the latest published version, wipes `node_modules` and `package-lock.json`, then reinstalls clean.
+Upgrades every dependency in `package.json` (`dependencies`, `devDependencies`, `peerDependencies`, `optionalDependencies`, `overrides`, and `resolutions`) to the latest published version, wipes `node_modules` and lockfiles, then reinstalls clean using the detected package manager (`pnpm`, `yarn`, `bun`, or `npm`).
 
 No migration logic. No semver negotiation. Latest wins.
 
@@ -11,11 +11,11 @@ Ships as both:
 
 ## What it does
 
-1. Reads `package.json` in the current directory
-2. Queries `npm view <pkg> version` for every package in `dependencies` and `devDependencies`
-3. Writes the resolved exact versions back into `package.json`
-4. Deletes `node_modules` and `package-lock.json`
-5. Runs `npm install`
+1. Reads `package.json` in the current directory and detects the package manager (`pnpm`, `yarn`, `bun`, or `npm`)
+2. Queries the registry for every package in `dependencies`, `devDependencies`, `peerDependencies`, `optionalDependencies`, `overrides`, and `resolutions` (and `pnpm-workspace.yaml` if present)
+3. Writes the resolved exact versions back into `package.json` (and `pnpm-workspace.yaml`)
+4. Deletes `node_modules` and any existing lockfiles (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock*`)
+5. Runs the detected package manager's install (`pnpm install`, `yarn install`, `bun install`, or `npm install`)
 
 If a version cannot be resolved, that package is skipped with a warning. Other packages still update.
 
